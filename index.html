@@ -12,13 +12,94 @@
         <div class="container">
              <div class="jumbotron">
                 <h1>Hangman Game</h1> 
-                <p>Classic Hangman Game. Guess any letter to begin.</p> 
+                <p>Classic Hangman Game. Press any key to guess a letter.</p> 
             </div>
-           <p>Letters guessed:</p> 
-           <p>Lives remaining:</p> 
+           <div id="blanks-area"></div>
+           <p id="correct-letters">Correct Letters guessed:</p> 
+           <p id="incorrect-letters">Incorrect Letters guessed:</p> 
+           <p id="lives">Lives remaining: <span id="lives-remaining"></span></p> 
         </div>
-
+<!--DONE! word bank for letters to pull from-->
+<!--DONE! fill in word with letters, so you're spelling out a word, use spans not divs-->
+<!--don't count non-letters if event.keycode is in range of numbers, proceed-->
+<!--account for upper and lowercase letters-->
+<!--DONE! don't let user guess the same letter twice-->
+<!--check fridge javascript for helpful pieces-->
+<!--add game reset code-->
+<!--tell the user what the word was when they run out of guesses-->
+<!--play again button-->
         </p>
         </div>
+        <script>
+            // Game setup
+            var lives = 10;
+            var words = ["corn", "giraffe", "mouse","protein","zombie",
+                         "mcdonalds","hashbrown","marble","hallway","bee",
+                         "archetype", "door", "aladin", "frontier",
+                         "zinburger","crepes", "mariokart", "mountain"]
+            var wordChosen = words[Math.floor(Math.random() * words.length)];
+            var letters = wordChosen.split("")
+
+            // create blanks
+            for (i=0;i<letters.length;i++) {
+                 var gameBlanks = document.createElement("span");
+                 gameBlanks.innerHTML = " _ ";
+                 gameBlanks.setAttribute("data-letter", letters[i])
+                 gameBlanks.setAttribute("position", i)
+                 gameBlanks.setAttribute("id", "letter-" + i)
+                 var blanksDiv = document.getElementById("blanks-area");
+                 blanksDiv.appendChild(gameBlanks);
+            }
+
+            // set lives
+            var livesDiv = document.getElementById("lives-remaining");
+            livesDiv.innerHTML = lives;
+
+            // set guessedLetters
+            var guessedLetters = [];
+
+            // onkeyup guess protocol
+            document.onkeyup = function(event){
+                if (lives > 0) {
+                    var guess = event.key;
+                    // if the letter hasn't been guessed
+                    if (guessedLetters.indexOf(guess) === -1) {
+                        guessedLetters.push(guess);
+                        var letterFound = false;
+                        console.log(guess);
+                        for (i=0;i<letters.length;i++){
+                            if (guess === letters[i]) {
+                                var newDiv = document.createElement("div");
+                                newDiv.innerHTML = "<h3>" + letters[i] + "</h3>";
+                                var targetDiv = document.getElementById("correct-letters");
+                                targetDiv.appendChild(newDiv);
+                                letterFound = true;
+                                
+                                // replace blank with guessed letter 
+                                var guessedLetter = document.createElement("span");
+                                guessedLetter.innerHTML = " " + letters[i] + " ";
+                                var targetBlank = document.getElementById("letter-"+ i);
+                                targetBlank.parentNode.replaceChild(guessedLetter, targetBlank);
+                            }
+                        }
+                        if (letterFound == false) {
+                                console.log("you guessed a letter not in the word!")
+                                var newDiv = document.createElement("div");
+                                newDiv.innerHTML = "<h3>" + guess + "</h3>";
+                                var targetDiv = document.getElementById("incorrect-letters");
+                                targetDiv.appendChild(newDiv);
+                                lives--
+                                livesDiv.innerHTML = lives;
+
+                            }
+                    } else {
+                        console.log("That letter has already been guessed")
+                    }
+
+                } else {
+                        alert("The word was " + wordChosen)
+                    }
+                    }
+        </script>
     </body>
 </html>

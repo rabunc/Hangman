@@ -1,3 +1,8 @@
-.display-3 {
+.jumbotron {
+    font: georgia;
+}
+
+#blanks-area {
+    font-size: 55px;
     text-align: center;
 }
