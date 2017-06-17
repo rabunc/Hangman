@@ -1,10 +1,12 @@
-h1 {
-    font-size: 50px;
-}
-
 .jumbotron {
     font: georgia;
+    font-size: 55px;
 }
+
+h1 {
+    font-size: 55px !important;
+}
+
 
 #blanks-area {
     font-size: 55px;
