@@ -1,111 +1,142 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="assets/CSS/reset.css">
-        <link rel="stylesheet" href="assets/CSS/style.css">
-    </head>
 
-    <body>
-        <div class="container">
-             <div class="jumbotron">
-                <h1>Hangman Game</h1> 
-                <p>Classic Hangman Game. Press any key to guess a letter.</p> 
-            </div>
-           <div style="text-align: center" id="blanks-area"></div>
-           <p id="correct-letters">Correct Letters guessed:</p> 
-           <p id="incorrect-letters">Incorrect Letters guessed:</p> 
-           <p id="lives">Lives remaining: <span id="lives-remaining"></span></p> 
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="assets/CSS/reset.css">
+    <link rel="stylesheet" href="assets/CSS/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Hangman Game</h1>
+            <p>Classic Hangman Game. Press any key to guess a letter.</p>
         </div>
-<!--DONE! word bank for letters to pull from-->
-<!--DONE! fill in word with letters, so you're spelling out a word, use spans not divs-->
-<!--don't count non-letters if event.keycode is in range of numbers, proceed-->
-<!--account for upper and lowercase letters-->
-<!--DONE! don't let user guess the same letter twice-->
-<!--check fridge javascript for helpful pieces-->
-<!--add game reset code-->
-<!--tell the user what the word was when they run out of guesses-->
-<!--play again button-->
+        <div style="text-align: center" id="blanks-area"></div>
+        <p id="correct-letters">Correct Letters guessed:</p>
+        <p id="incorrect-letters">Incorrect Letters guessed:</p>
+        <p id="lives">Lives remaining: <span id="lives-remaining"></span></p>
+        <div id="reset-area">
+        </div>
+        <!--DONE! word bank for letters to pull from-->
+        <!--DONE! fill in word with letters, so you're spelling out a word, use spans not divs-->
+        <!--don't count non-letters if event.keycode is in range of numbers, proceed-->
+        <!--account for upper and lowercase letters-->
+        <!--DONE! don't let user guess the same letter twice-->
+        <!--check fridge javascript for helpful pieces-->
+        <!--add game reset code-->
+        <!--tell the user what the word was when they run out of guesses-->
+        <!--play again button-->
         </p>
-        </div>
-        <script>
-            // Game setup
-            var lives = 10;
-            var words = ["corn", "giraffe", "mouse","protein","zombie",
-                         "mcdonalds","hashbrown","marble","hallway","bee",
-                         "archetype", "door", "aladin", "frontier",
-                         "zinburger","crepes", "mariokart", "mountain"]
-            var checkKeyCode = function(key) {
-                var keyInRange = false;
-                if (key.keycode >= 65 && key.keycode <= 90) {
-                    keyInRange = true;
+    </div>
+    <script>
+        // Game setup
+        var guessedLetters = [];
+        var words = ["corn", "giraffe", "mouse", "protein", "zombie",
+            "mcdonalds", "hashbrown", "marble", "hallway", "bee",
+            "archetype", "door", "aladin", "frontier",
+            "zinburger", "crepes", "mariokart", "mountain"]
+        var lives = 10;
+        var livesDiv = document.getElementById("lives-remaining");
+        livesDiv.innerHTML = lives;
+        var wordChosen = words[Math.floor(Math.random() * words.length)];
+        var letters = wordChosen.split("")
+
+        var checkKeyCode = function (event) {
+            console.log(event.keyCode)
+            if (event.keyCode >= 65 && event.keyCode <= 90) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        var checkLives = function () {
+            if (lives > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        var checkUnguessed = function (guess) {
+            if (guessedLetters.indexOf(guess) === -1) {
+                guessedLetters.push(guess);
+                return true
+            } else {
+                console.log("That letter's already been guessed")
+                return false
+            }
+        }
+
+        // create blanks
+        for (i = 0; i < letters.length; i++) {
+            var gameBlanks = document.createElement("span");
+            gameBlanks.innerHTML = " _ ";
+            gameBlanks.setAttribute("data-letter", letters[i])
+            gameBlanks.setAttribute("position", i)
+            gameBlanks.setAttribute("id", "letter-" + i)
+            var blanksDiv = document.getElementById("blanks-area");
+            blanksDiv.appendChild(gameBlanks);
+        }
+
+
+
+        // onkeyup guess protocol
+        document.onkeyup = function (event) {
+            var guess = event.key;
+
+            if (!checkKeyCode(event)) {
+                alert("That's not a letter!")
+                return
+            }
+
+            if (!checkLives()) {
+                return
+            }
+
+            if (!checkUnguessed(guess)) {
+                return
+            }
+
+            var letterFound = false;
+            console.log(guess);
+
+            for (i = 0; i < letters.length; i++) {
+                if (guess === letters[i]) {
+                    var newDiv = document.createElement("div");
+                    newDiv.innerHTML = "<h3>" + letters[i] + "</h3>";
+                    var targetDiv = document.getElementById("correct-letters");
+                    targetDiv.appendChild(newDiv);
+                    letterFound = true;
+                    // replace blank with guessed letter 
+                    var guessedLetter = document.createElement("span");
+                    guessedLetter.innerHTML = " " + letters[i] + " ";
+                    var targetBlank = document.getElementById("letter-" + i);
+                    targetBlank.parentNode.replaceChild(guessedLetter, targetBlank);
                 }
             }
-            var wordChosen = words[Math.floor(Math.random() * words.length)];
-            var letters = wordChosen.split("")
-
-            // create blanks
-            for (i=0;i<letters.length;i++) {
-                 var gameBlanks = document.createElement("span");
-                 gameBlanks.innerHTML = " _ ";
-                 gameBlanks.setAttribute("data-letter", letters[i])
-                 gameBlanks.setAttribute("position", i)
-                 gameBlanks.setAttribute("id", "letter-" + i)
-                 var blanksDiv = document.getElementById("blanks-area");
-                 blanksDiv.appendChild(gameBlanks);
+            if (letterFound == false) {
+                console.log("you guessed a letter not in the word!")
+                var newDiv = document.createElement("div");
+                newDiv.innerHTML = "<h3>" + guess + "</h3>";
+                var targetDiv = document.getElementById("incorrect-letters");
+                targetDiv.appendChild(newDiv);
+                lives--
+                livesDiv.innerHTML = lives;
             }
 
-            // set lives
-            var livesDiv = document.getElementById("lives-remaining");
-            livesDiv.innerHTML = lives;
 
-            // set guessedLetters
-            var guessedLetters = [];
+            if (!checkLives()) {
+                alert("The word was " + wordChosen)
+                return
+            }
+        }
+    </script>
+</body>
 
-            // onkeyup guess protocol
-            document.onkeyup = function(event){
-                if (lives > 0) {
-                    var guess = event.key;
-                    // if the letter hasn't been guessed
-                    if (guessedLetters.indexOf(guess) === -1) {
-                        guessedLetters.push(guess);
-                        var letterFound = false;
-                        console.log(guess);
-                        for (i=0;i<letters.length;i++){
-                            if (guess === letters[i]) {
-                                var newDiv = document.createElement("div");
-                                newDiv.innerHTML = "<h3>" + letters[i] + "</h3>";
-                                var targetDiv = document.getElementById("correct-letters");
-                                targetDiv.appendChild(newDiv);
-                                letterFound = true;
-                                
-                                // replace blank with guessed letter 
-                                var guessedLetter = document.createElement("span");
-                                guessedLetter.innerHTML = " " + letters[i] + " ";
-                                var targetBlank = document.getElementById("letter-"+ i);
-                                targetBlank.parentNode.replaceChild(guessedLetter, targetBlank);
-                            }
-                        }
-                        if (letterFound == false) {
-                                console.log("you guessed a letter not in the word!")
-                                var newDiv = document.createElement("div");
-                                newDiv.innerHTML = "<h3>" + guess + "</h3>";
-                                var targetDiv = document.getElementById("incorrect-letters");
-                                targetDiv.appendChild(newDiv);
-                                lives--
-                                livesDiv.innerHTML = lives;
-
-                            }
-                    } else {
-                        console.log("That letter has already been guessed")
-                    }
-
-                } else {
-                        alert("The word was " + wordChosen)
-                    }
-                    }
-        </script>
-    </body>
 </html>
